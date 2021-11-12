@@ -1,20 +1,2 @@
 ﻿  main.cpp
-c:\users\fautr\desktop\github\projet_mariolike\mariolike\mariolike\main.cpp(14): warning C4244: 'argument' : conversion de 'T' en 'T', perte possible de données
-          with
-          [
-              T=unsigned int
-          ]
-          and
-          [
-              T=float
-          ]
-c:\users\fautr\desktop\github\projet_mariolike\mariolike\mariolike\main.cpp(16): warning C4244: 'argument' : conversion de 'T' en 'T', perte possible de données
-          with
-          [
-              T=unsigned int
-          ]
-          and
-          [
-              T=float
-          ]
   MarioLike.vcxproj -> C:\Users\fautr\Desktop\GitHub\Projet_MarioLike\MarioLike\x64\Debug\MarioLike.exe
