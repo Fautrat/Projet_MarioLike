@@ -3,7 +3,7 @@
 #include "Character.h"
 #include "Platforms.h"
 
-#define GRAVITY 3.f
+
 
 class Game
 {

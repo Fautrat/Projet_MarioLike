@@ -36,43 +36,33 @@ void Game::Loop()
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
 		{
 			// la touche "flèche gauche" est enfoncée : on bouge le personnage
-			character->character.move(-VELOCITY, 0.f);
+			character->setSpeedX(-VELOCITY);
 		}
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
 		{
 			// la touche "flèche droite" est enfoncée : on bouge le personnage
-			character->character.move(VELOCITY, 0.f);
+			character->setSpeedX(VELOCITY);
 		}
 
-		if (!character->boundingBox.intersects(platforms->boundingBox))
+		if (character->boundingBox.intersects(platforms->boundingBox))
 		{
-			character->character.move(0, GRAVITY);
+			character->endJump();
 		}
 			
-		//if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && isJumping == 0)
-		//{
-		//	isJumping = 1;
-		//	velocity = -0.70f;
-		//}
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && !character->isJumping())
+		{
+			character->startJump();
+		}
 
-		///* gestion de la vélocité en l'air */
-		//if (isJumping == 1)
-		//{
-		//	chara.move(0, velocity);
-		//	velocity += 0.002f;
-		//}
+		character->update(); /* update le boxing collision du character et bouge le personnage */
 
-		///* arret du saut */
-		//if (chara.getPosition().y >= platform.getPosition().y - 45 && isJumping == 1)
-		//{
-		//	isJumping = 0;
-		//}
 
-		character->update();
 		window.clear();
+
 		window.draw(Background);
 		window.draw(platforms->platform);
 		window.draw(character->character);
+
 		window.display();
 	}
 }

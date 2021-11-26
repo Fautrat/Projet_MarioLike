@@ -2,6 +2,9 @@
 #include <SFML/Graphics.hpp>
 
 #define VELOCITY 3.f
+#define JUMP_VELOCITY 8.f
+#define MAX_VELOCITY 8.f
+#define GRAVITY 0.2f
 
 class Character 
 {
@@ -29,10 +32,21 @@ public:
 	/* Get player speed. */
 	float getSpeed();
 
+	void setSpeedX(float);
+
+	void setSpeedY(float);
+
 	void update();
 
+	void startJump();
+
+	void endJump();
+
+	bool isJumping();
+
 private :
-	bool isJumping;
-	float speed;
+	bool jump;
+	float speedX;
+	float speedY;
 
 };
