@@ -1,9 +1,9 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 
-#define VELOCITY 0.8
+#define VELOCITY 3.f
 
-class Character
+class Character 
 {
 public:
 
@@ -28,6 +28,8 @@ public:
 
 	/* Get player speed. */
 	float getSpeed();
+
+	void update();
 
 private :
 	bool isJumping;

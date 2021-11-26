@@ -7,5 +7,5 @@ Platforms::Platforms()
 
 	this->platform.setPosition(sf::Vector2f(10.f, 800.f));
 
-	//this->boundingBox = platform.getGlobalBounds;
+	this->boundingBox = platform.getGlobalBounds();
 }

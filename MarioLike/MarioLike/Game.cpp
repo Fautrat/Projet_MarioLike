@@ -36,16 +36,19 @@ void Game::Loop()
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
 		{
 			// la touche "flèche gauche" est enfoncée : on bouge le personnage
-			character->character.move(-0.25, 0.f);
+			character->character.move(-VELOCITY, 0.f);
 		}
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
 		{
 			// la touche "flèche droite" est enfoncée : on bouge le personnage
-			character->character.move(0.25, 0.f);
+			character->character.move(VELOCITY, 0.f);
 		}
 
-		if(!character->boundingBox.intersects(platforms->boundingBox))
-			character->character.move(0, - GRAVITY);
+		if (!character->boundingBox.intersects(platforms->boundingBox))
+		{
+			character->character.move(0, GRAVITY);
+		}
+			
 		//if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && isJumping == 0)
 		//{
 		//	isJumping = 1;
@@ -65,6 +68,7 @@ void Game::Loop()
 		//	isJumping = 0;
 		//}
 
+		character->update();
 		window.clear();
 		window.draw(Background);
 		window.draw(platforms->platform);
