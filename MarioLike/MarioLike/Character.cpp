@@ -1,11 +1,12 @@
 #include "Character.h"
 
 
+
 Character::Character() 
 {
 	this->character_texture.loadFromFile("../../Sprites/Character.png");
 	this->character.setTexture(character_texture);
-	this->character.setPosition(sf::Vector2f(10.f, 700.f));
+	this->character.setPosition(sf::Vector2f(STARTING_POS_X, STARTING_POS_Y));
 	this->jump = false;
 	this->speedX = 0;
 	this->speedY = 0;

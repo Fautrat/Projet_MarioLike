@@ -18,5 +18,7 @@ public:
 	Game();
 	~Game();
 
-	void Loop();
+	void loop();
+	void restart();
+	void start();
 };

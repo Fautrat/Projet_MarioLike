@@ -6,6 +6,9 @@
 #define MAX_VELOCITY 8.f
 #define GRAVITY 0.2f
 
+#define STARTING_POS_Y 700.f
+#define STARTING_POS_X 30.f
+
 class Character 
 {
 public:

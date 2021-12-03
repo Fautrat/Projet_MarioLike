@@ -3,3 +3,8 @@ MarioLike/.vs/MarioLike/v15/Browse.VC.opendb
 MarioLike/.vs/MarioLike/v15/ipch/AutoPCH/37db28faee10a653/MAIN.ipch
 MarioLike/.vs/MarioLike/v15/Browse.VC.db
 MarioLike/.vs/MarioLike/v15/Browse.VC.db
+*.obj
+*.tlog
+*.pdb
+MarioLike/.vs/MarioLike/v15/.suo
+*.ipch

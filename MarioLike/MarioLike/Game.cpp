@@ -1,12 +1,14 @@
 #include "Game.h"
 
-#define WINDOW_WIDTH 1600
-#define WINDOW_HEIGHT 900
+#define WINDOW_WIDTH 1920
+#define WINDOW_HEIGHT 1080
+#define MAX_FPS 60
+
 
 Game::Game()
 {
-	this->window.create(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "Mario in Space");
-	this->window.setFramerateLimit(60);
+	this->window.create(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "Mario in Space", sf::Style::Fullscreen);
+	this->window.setFramerateLimit(MAX_FPS);
 	this->size = window.getSize();
 	this->character = new Character();
 	this->platforms = new Platforms();
@@ -19,9 +21,54 @@ Game::~Game()
 
 }
 
-void Game::Loop()
+void Game::restart()
+{
+	this->character = new Character();
+}
+
+
+void Game::start()
+{
+	sf::Sprite button_play;
+	sf::Texture button_texture;
+
+	bool start = false;
+	button_texture.loadFromFile("../../Sprites/Button.jpg");
+	button_play.setTexture(button_texture);
+
+	button_play.setPosition(760.f, 460.f);
+
+	while (window.isOpen() && !start)
+	{
+
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
+		{
+			// la touche "echap" est enfoncée : on met l'event a closed
+			window.close();
+			break;
+		}
+
+		if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
+		{
+			// le bouton gauche est enfoncé 
+			sf::Vector2i localPosition = sf::Mouse::getPosition(window);
+			if (localPosition.x >= button_play.getPosition().x && localPosition.y >= button_play.getPosition().y && localPosition.x <= button_play.getPosition().x + 400 && localPosition.y <= button_play.getPosition().y + 190)
+				start = true;
+		}
+
+		printf("pos start x %d et y %d", button_play.getPosition().x, button_play.getPosition().y);
+
+		window.draw(button_play);
+
+		window.display();
+	}
+}
+
+void Game::loop()
 {
 	sf::Clock clock;
+
+	start();
 
 	while (window.isOpen())
 	{
@@ -42,6 +89,19 @@ void Game::Loop()
 		{
 			// la touche "flèche droite" est enfoncée : on bouge le personnage
 			character->setSpeedX(VELOCITY);
+		}
+
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::R))
+		{
+			// la touche "R" est enfoncée : on restart le personnage
+			restart();
+		}
+
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
+		{
+			// la touche "echap" est enfoncée : on met l'event a closed
+			window.close();
+			break;
 		}
 
 		if (character->boundingBox.intersects(platforms->boundingBox))
