@@ -19,17 +19,17 @@ void Character::move(float x, float y)
 	this->character.move(x,y);
 }
 
+/* Update la boundingbox du joueur, mets à jour sa position avec un move et change sa vitesse */
 void Character::update()
 {
-	
-
 	this->character.move(speedX, speedY);
+
+	boundingBox = character.getGlobalBounds();
 
 	setSpeedY(speedY + GRAVITY);
 	setSpeedX(0.f);
-
-	boundingBox = character.getGlobalBounds();
 }
+
 
 void Character::startJump()
 {

@@ -5,6 +5,7 @@ int main()
 {
 
 	Game* game = new Game();
+	game->start();
 	game->loop();
 	delete game;
 	game = nullptr;
