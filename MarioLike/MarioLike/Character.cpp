@@ -30,6 +30,10 @@ void Character::update()
 	setSpeedX(0.f);
 }
 
+void Character::draw(sf::RenderWindow window)
+{
+	window.draw(character);
+}
 
 void Character::startJump()
 {

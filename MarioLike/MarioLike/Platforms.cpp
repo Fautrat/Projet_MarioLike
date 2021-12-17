@@ -1,11 +1,11 @@
 #include "Platforms.h"
 
-Platforms::Platforms()
+Platforms::Platforms(float x, float y)
 {
 	this->platforms_texture.loadFromFile("../../Sprites/platform.png");
 	this->platform.setTexture(platforms_texture);
 
-	this->platform.setPosition(sf::Vector2f(20.f, 900.f));
+	this->platform.setPosition(x, y);
 
 	this->boundingBox = platform.getGlobalBounds();
 }

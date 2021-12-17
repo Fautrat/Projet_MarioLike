@@ -9,7 +9,7 @@ public:
 	sf::Texture platforms_texture;
 	sf::FloatRect boundingBox;
 
-	Platforms();
+	Platforms(float, float);
 	~Platforms();
 
 

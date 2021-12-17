@@ -7,13 +7,37 @@
 
 Game::Game()
 {
+	/* création de la fenetre */
 	this->window.create(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "Mario in Space");
 	this->window.setFramerateLimit(MAX_FPS);
-	this->size = window.getSize();
+
+
+	/* création du personnage */
 	this->character = new Character();
-	this->platforms = new Platforms();
-	this->Background_texture.loadFromFile("../../Sprites/Background2.jpg");
-	this->Background.setTexture(Background_texture);
+
+	/* création des platforms */
+	this->platforms.push_back(new Platforms(20,900));
+	this->platforms.push_back(new Platforms(500, 900));
+	this->platforms.push_back(new Platforms(900, 900));
+
+	/* création du background */
+	this->backgroundTexture.loadFromFile("../../Sprites/Background2.jpg");
+	this->background.setTexture(backgroundTexture);
+
+	/* creation du bouton de start */
+
+	this->buttonTexture.loadFromFile("../../Sprites/Button.png");
+	this->button.setTexture(buttonTexture);
+	this->button.setOrigin(195, 85);
+	this->button.setPosition(window.getSize().x / 2, window.getSize().y / 2);
+
+	/* Init des Menus */
+	this->gameOver = new GameOverMenu(this->window);
+	this->pause = new PauseMenu(this->window);
+	this->start = new StartMenu(this->window);
+
+	// Game status
+	this->status = GameStatus::START;
 }
 
 Game::~Game()
@@ -26,40 +50,6 @@ void Game::restart()
 	this->character = new Character();
 }
 
-
-void Game::start()
-{
-	sf::Sprite button_play;
-	sf::Texture button_texture;
-
-	button_texture.loadFromFile("../../Sprites/Button.jpg");
-	button_play.setTexture(button_texture);
-
-	button_play.setPosition(760.f, 460.f);
-
-	while (window.isOpen())
-	{
-
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
-		{
-			// la touche "echap" est enfoncée : on met l'event a closed
-			window.close();
-			return;
-		}
-
-		if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
-		{
-			// le bouton gauche est enfoncé 
-			sf::Vector2i localPosition = sf::Mouse::getPosition(window);
-			if (localPosition.x >= button_play.getPosition().x && localPosition.y >= button_play.getPosition().y && localPosition.x <= button_play.getPosition().x + 400 && localPosition.y <= button_play.getPosition().y + 190)
-				return;
-		}
-		window.draw(button_play);
-
-		window.display();
-	}
-}
-
 void Game::loop()
 {
 	sf::Clock clock;
@@ -70,53 +60,110 @@ void Game::loop()
 		sf::Event event;
 		while (window.pollEvent(event))
 		{
+			switch (event.type)
+			{
+				// Close window
+				case sf::Event::Closed:
+					window.close();
+					break;
+
+				case sf::Event::KeyPressed :
+					if(event.key.code == sf::Keyboard::Escape)
+						window.close();
+					if (event.key.code == sf::Keyboard::P)
+					{
+						if (status == GameStatus::INGAME)
+						{
+							status = GameStatus::PAUSE;
+						}
+						else if (status == GameStatus::PAUSE)
+						{
+							status = GameStatus::INGAME;
+						}
+					}
+					if (event.key.code == sf::Keyboard::Enter)
+					{
+						if (status == GameStatus::START)
+						{
+							status = GameStatus::INGAME;
+						}
+						else if (status == GameStatus::GAMEOVER)
+						{
+							status = GameStatus::INGAME;
+						}
+					}
+			}
 			if (event.type == sf::Event::Closed)
 				window.close();
 		}
 
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+		if (status == GameStatus::START) 
 		{
-			// la touche "flèche gauche" est enfoncée : on bouge le personnage
-			character->setSpeedX(-VELOCITY);
-		}
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
-		{
-			// la touche "flèche droite" est enfoncée : on bouge le personnage
-			character->setSpeedX(VELOCITY);
+			window.clear();
+			start->draw(window);
 		}
 
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::R))
+		else if (status == GameStatus::PAUSE)
 		{
-			// la touche "R" est enfoncée : on restart le personnage
-			restart();
+			window.clear();
+			pause->draw(window);
 		}
 
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
+		else if (status == GameStatus::INGAME)
 		{
-			// la touche "echap" est enfoncée : on met l'event a closed
-			window.close();
-			break;
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+			{
+				// la touche "flèche gauche" est enfoncée :  on change la vitesse du personnage
+				character->setSpeedX(-VELOCITY);
+			}
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+			{
+				// la touche "flèche droite" est enfoncée : on change la vitesse du personnage
+				character->setSpeedX(VELOCITY);
+			}
+
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::R))
+			{
+				// la touche "R" est enfoncée : on restart le personnage
+				restart();
+			}
+
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
+			{
+				// la touche "echap" est enfoncée : on met l'event a closed
+				window.close();
+				break;
+			}
+
+			for (auto& itr : platforms)
+			{
+				if (character->boundingBox.intersects(itr->boundingBox))
+				{
+					character->endJump();
+				}
+			}
+
+
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && !character->isJumping())
+			{
+				character->startJump();
+			}
+
+			character->update(); /* update le boxing collision du character et bouge le personnage */
+
+
+			window.clear();
+
+			window.draw(background);
+
+			for (auto& itr : platforms)
+			{
+				window.draw(itr->platform);
+			}
+
+			window.draw(character->character);
 		}
-
-		if (character->boundingBox.intersects(platforms->boundingBox))
-		{
-			character->endJump();
-		}
-			
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && !character->isJumping())
-		{
-			character->startJump();
-		}
-
-		character->update(); /* update le boxing collision du character et bouge le personnage */
-
-
-		window.clear();
-
-		window.draw(Background);
-		window.draw(platforms->platform);
-		window.draw(character->character);
-
+		/* Fonction obligatoire pour afficher la fenetre */
 		window.display();
 	}
 }

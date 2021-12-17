@@ -26,15 +26,6 @@ public:
 	/* Function draw character to window  */
 	void draw(sf::RenderWindow);
 
-	/* Get player X coordinates. */
-	float getX();
-
-	/* Get player Y coordinates. */
-	float getY();
-
-	/* Get player speed. */
-	float getSpeed();
-
 	void setSpeedX(float);
 
 	void setSpeedY(float);
