@@ -1,2 +1,0 @@
-﻿  main.cpp
-c:\users\fautr\desktop\github\projet_mariolike\mariolike\mariolike\main.cpp(1): fatal error C1083: Impossible d'ouvrir le fichier include : 'SFML/Graphics.hpp' : No such file or directory
