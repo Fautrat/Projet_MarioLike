@@ -187,13 +187,13 @@ int Map::checkCollisions(int input) {
 					it = collimap.begin();
 					break;
 				case Direction::LEFT:
-					player->setPosition({ x + 55.f , player->getY() });
+					player->setPosition({ x + 55.f , player->getY() }); /* distance 55.f plus grande sinon on collisionne encore avec l'enemy */
 					player->damage();
 					if (player->getLife() == 0)
 						return GameStatus::GAMEOVER;
 					break;
 				case Direction::RIGHT:
-					player->setPosition({ x - 55.f, player->getY() });
+					player->setPosition({ x - 55.f, player->getY() }); /* distance 55.f plus grande sinon on collisionne encore avec l'enemy */
 					player->damage();
 					if (player->getLife() == 0)
 						return GameStatus::GAMEOVER;

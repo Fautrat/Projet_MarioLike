@@ -4,7 +4,6 @@ Player::Player(sf::Vector2f size, sf::Texture* texture, sf::Vector2f position) {
     player.setSize(size);
     player.setTexture(texture);
 	player.setPosition(position);
-	this->size = size.y;
 	this->moveSpeedX = 0.f;
 	this->moveSpeedY = 0.f;
 	this->isJumping = false;

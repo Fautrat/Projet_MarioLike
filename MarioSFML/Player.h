@@ -49,7 +49,6 @@ public:
 
 private:
     sf::RectangleShape player;
-    float size;
     float moveSpeedX;
 	float moveSpeedY;
 	bool isJumping;

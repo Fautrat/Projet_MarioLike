@@ -9,7 +9,7 @@ class Block
 {
 public:
 	Block(sf::Vector2f size, sf::Texture *texture, sf::Vector2f position);
-	~Block() = default;
+	virtual ~Block() = default;
 
 	/* Get block X coordinates. */
 	float getX();
@@ -36,7 +36,7 @@ class Ground : public Block
 {
 public:
 	Ground(sf::Vector2f size, sf::Texture* texture, sf::Vector2f position);
-	~Ground() = default;
+	virtual ~Ground() = default;
 };
 
 /* --------------- COIN --------------- */
@@ -45,7 +45,7 @@ class Coin : public Block
 {
 public:
 	Coin(sf::Vector2f size, sf::Texture* texture, sf::Vector2f position);
-	~Coin() = default;
+	virtual ~Coin() = default;
 };
 
 /* --------------- FLAG --------------- */
@@ -55,7 +55,7 @@ class Flag : public Block
 public:
 
 	Flag(sf::Vector2f size, sf::Texture* texture, sf::Vector2f position);
-	~Flag() = default;
+	virtual ~Flag() = default;
 };
 
 #endif // !BLOCK_H

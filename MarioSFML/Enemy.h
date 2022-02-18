@@ -9,7 +9,7 @@ class Enemy
 {
 public:
 	Enemy(sf::Vector2f size, sf::Texture* texture, sf::Vector2f position);
-	~Enemy() = default;
+	virtual ~Enemy() = default;
 
 	/* Get enemy collision box. */
 	sf::FloatRect getGlobalBounds();
@@ -34,7 +34,7 @@ class Astronaut : public Enemy
 {
 public:
 	Astronaut(sf::Vector2f size, sf::Texture* texture, sf::Vector2f position);
-	~Astronaut() = default;
+	virtual ~Astronaut() = default;
 };
 
 #endif // !ENEMY_H

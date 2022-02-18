@@ -207,7 +207,6 @@ void Game::gameLoop()
 			if (widget.second->getActive())
 				widget.second->draw(window);
 		}
-
 		window.display();
     }
 }

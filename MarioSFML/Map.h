@@ -5,7 +5,6 @@
 #include "Enemy.h"
 #include "Block.h"
 #include "Player.h"
-#include "Quadtree.h"
 
 class Map
 {
@@ -17,8 +16,6 @@ public:
 	std::map<std::pair<float, float>, Flag*> flagMap;
 
 	std::map<std::pair<float, float>, std::string> collimap;
-
-	Quadtree* quadtree;
 
 	sf::Vector2f size;
 	sf::Vector2i nbBlocks;
