@@ -1,7 +1,6 @@
 #include "Game.h"
 #include "GameUI.h"
 #include "Map.h"
-#include "Directions.h"
 
 #define WINDOW_WIDTH 1200
 #define WINDOW_HEIGHT 800
@@ -68,7 +67,7 @@ void Game::loadTextures() {
 	assets.loadTexture("nearBackground", "assets/sprites/nearBackground.png");
 	assets.loadTexture("player", "assets/sprites/player.png");
 	assets.loadTexture("ground", "assets/sprites/ground.png");
-	assets.loadTexture("wolf", "assets/sprites/wolf.png");
+	assets.loadTexture("astronaut", "assets/sprites/undertale.png");
 	assets.loadTexture("coin", "assets/sprites/coin.png");
 	assets.loadTexture("flagBottom", "assets/sprites/flag_bottom.png");
 	assets.loadTexture("flagMiddle", "assets/sprites/flag_middle.png");
@@ -149,15 +148,15 @@ void Game::gameLoop()
 				}
 			}
 		}
+		window.clear();
+
 		// Check user input and player collisions if the game is running
-		if (status == GameStatus::INGAME) 
-			status = map->checkCollisions(map->player->inputProcessing(deltaTime, map->size.x - 40));
+		if (status == GameStatus::INGAME)
+			status = map->checkCollisions(map->player->inputProcessing(deltaTime, map->size.x));
 
 		// Update UI
 		for (auto widget : widgets) 
 			widget.second->update(status);
-
-		window.clear();
 
 		// Update views if the game started
 		if (status == GameStatus::INGAME || status == GameStatus::PAUSE) {

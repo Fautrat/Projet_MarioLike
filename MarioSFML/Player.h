@@ -2,7 +2,15 @@
 #define PLAYER_H
 
 #include <SFML/Graphics.hpp>
-#include "Directions.h"
+
+
+enum Direction {
+	DOWN = -2,
+	LEFT = -1,
+	UP = 0,
+	RIGHT = 1
+};
+#define GRAVITY 6.f
 
 class Player
 {
@@ -12,9 +20,6 @@ public:
 
     /* Draw player on specified window. */
 	void draw(sf::RenderWindow& window);
-
-    /* Make the player jump with specified distance. */
-	void jump(sf::Vector2f distance);
 
     /* Set player position. */
 	void setPosition(sf::Vector2f position);
@@ -27,9 +32,6 @@ public:
 
     /* Get player Y coordinates. */
 	float getY();
-
-    /* Get player speed. */
-    float getSpeed();
 
     /* Get player score. */
     int getScore();
@@ -44,21 +46,13 @@ public:
 
     /* End player jumping. */
     void stopJumping();
-    void setPosY(float posY);
-    void setStartJumping();
-    void setBaseY();
 
 private:
     sf::RectangleShape player;
     float size;
-    float moveSpeed;
+    float moveSpeedX;
 	float moveSpeedY;
-    bool isJumping;
-    float maxJump;
-    float posY;
-    float basePosY;
-    bool startJumping;
-    float gravity;
+	bool isJumping;
     int score;
     int life;
 };

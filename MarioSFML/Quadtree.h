@@ -27,10 +27,10 @@ public:
 private:
     const int QT_NODE_CAPACITY = 4;
 
-    float x;
-    float y;
-    float halfDimensionX;
-    float halfDimensionY;
+	float x;
+	float y;
+	float halfDimensionX;
+	float halfDimensionY;
 
     std::vector<float> pointsX;
     std::vector<float> pointsY;

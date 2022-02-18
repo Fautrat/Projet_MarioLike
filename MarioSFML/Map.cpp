@@ -3,25 +3,19 @@
 #include <iostream>
 #include <fstream>
 
-#define BLOCKSIZE 40;
-#define QUADTREE_X 3000
+#define BLOCKSIZE 40.f
+#define QUADTREE_X 3600
 #define QUADTREE_Y 800
-#define DISTANCE 10
+#define DISTANCE 41.f
 
-Map::Map(AssetsManager& assets, sf::RenderWindow& window) {
+Map::Map(AssetsManager& assets, sf::RenderWindow& window) 
+{
+	size = {(float)window.getSize().x, (float)window.getSize().y };
 
-	this->blockSize = BLOCKSIZE;
-	this->size = {(float)window.getSize().x, (float)window.getSize().y };
+	player = nullptr;
 
-	this->quadtree = new Quadtree(QUADTREE_X , QUADTREE_Y , QUADTREE_X , QUADTREE_Y );
+	active = false;
 
-	this->player = nullptr;
-
-	this->active = false;
-
-	//readMap(assets);
-
-	//this->size = { nbBlocks.x * blockSize, nbBlocks.y * blockSize };
 }
 
 Map::~Map() {
@@ -46,9 +40,6 @@ Map::~Map() {
 	enemyMap.clear();
 	coinMap.clear();
 	flagMap.clear();
-
-	delete quadtree;
-	quadtree = nullptr;
 }
 
 void Map::draw(sf::RenderWindow& window) {
@@ -101,278 +92,113 @@ void Map::readMap(AssetsManager& assets, std::string& filename) {
 		}
 
 		if (ch == 'P') 
-			this->player = new Player({ blockSize, blockSize }, &assets.getTRef("player"), { blockSize * col, size.y - row * blockSize});
+			this->player = new Player({ BLOCKSIZE, BLOCKSIZE }, &assets.getTRef("player"), { BLOCKSIZE * col, size.y - row * BLOCKSIZE });
 
 		if (ch == 'G') {
-			Ground* ground = new Ground({ blockSize, blockSize }, &assets.getTRef("ground"), { blockSize * col, size.y - row * blockSize });
-			groundMap.insert({ std::make_pair(blockSize * col, size.y - row * blockSize),ground });
-			quadtree->insert(blockSize * col, size.y - row * blockSize,"ground");
+			Ground* ground = new Ground({ BLOCKSIZE, BLOCKSIZE }, &assets.getTRef("ground"), { BLOCKSIZE * col, size.y - row * BLOCKSIZE });
+			groundMap.insert({ std::make_pair(BLOCKSIZE * col, size.y - row * BLOCKSIZE),ground });
+			collimap.insert({ std::make_pair(BLOCKSIZE * col, size.y - row * BLOCKSIZE), "ground" });
 		}
 
 		if (ch == '1') {
-			Wolf* enemy = new Wolf({ blockSize, blockSize }, &assets.getTRef("wolf"), { blockSize * col, size.y - row * blockSize });
-			enemyMap.insert({ std::make_pair(blockSize * col, size.y - row * blockSize),enemy });
-			quadtree->insert(blockSize * col, size.y - row * blockSize, "enemy");
+			Astronaut* enemy = new Astronaut({ BLOCKSIZE, BLOCKSIZE }, &assets.getTRef("astronaut"), { BLOCKSIZE * col, size.y - row * BLOCKSIZE });
+			enemyMap.insert({ std::make_pair(BLOCKSIZE * col, size.y - row * BLOCKSIZE),enemy });
+			collimap.insert({ std::make_pair(BLOCKSIZE * col, size.y - row * BLOCKSIZE), "enemy" });
 		}
 
 		if (ch == 'o') {
-			Coin* coin = new Coin({ blockSize, blockSize }, &assets.getTRef("coin"), { blockSize * col, size.y - row * blockSize });
-			coinMap.insert({ std::make_pair(blockSize * col, size.y - row * blockSize),coin });
-			quadtree->insert(blockSize * col, size.y - row * blockSize,"coin");
+			Coin* coin = new Coin({ BLOCKSIZE, BLOCKSIZE }, &assets.getTRef("coin"), { BLOCKSIZE * col, size.y - row * BLOCKSIZE });
+			coinMap.insert({ std::make_pair(BLOCKSIZE * col, size.y - row * BLOCKSIZE),coin });
+			collimap.insert({ std::make_pair(BLOCKSIZE * col, size.y - row * BLOCKSIZE), "coin" });
 		}
 
 		if (ch == '*') {
-			Flag* flag = new Flag({ blockSize, blockSize }, &assets.getTRef("flagMiddle"), { blockSize * col, size.y - row * blockSize });
-			flagMap.insert({ std::make_pair(blockSize * col, size.y - row * blockSize),flag });
-			quadtree->insert(blockSize * col, size.y - row * blockSize, "flag");
+			Flag* flag = new Flag({ BLOCKSIZE, BLOCKSIZE }, &assets.getTRef("flagMiddle"), { BLOCKSIZE * col, size.y - row * BLOCKSIZE });
+			flagMap.insert({ std::make_pair(BLOCKSIZE * col, size.y - row * BLOCKSIZE),flag });
+			collimap.insert({ std::make_pair(BLOCKSIZE * col, size.y - row * BLOCKSIZE), "flag" });
 		}
 
 		if (ch == '=') {
-			Flag* flag = new Flag({ blockSize, blockSize }, &assets.getTRef("flagBottom"), { blockSize * col, size.y - row * blockSize });
-			flagMap.insert({ std::make_pair(blockSize * col, size.y - row * blockSize),flag });
-			quadtree->insert(blockSize * col, size.y - row * blockSize, "flag");
+			Flag* flag = new Flag({ BLOCKSIZE, BLOCKSIZE }, &assets.getTRef("flagBottom"), { BLOCKSIZE * col, size.y - row * BLOCKSIZE });
+			flagMap.insert({ std::make_pair(BLOCKSIZE * col, size.y - row * BLOCKSIZE),flag });
+			collimap.insert({ std::make_pair(BLOCKSIZE * col, size.y - row * BLOCKSIZE), "flag" });
 		}
 
 		if (ch == '-') {
-			Flag* flag = new Flag({ blockSize, blockSize }, &assets.getTRef("flagTop"), { blockSize * col, size.y - row * blockSize });
-			flagMap.insert({ std::make_pair(blockSize * col, size.y - row * blockSize),flag });
-			quadtree->insert(blockSize * col, size.y - row * blockSize, "flag");
+			Flag* flag = new Flag({ BLOCKSIZE, BLOCKSIZE }, &assets.getTRef("flagTop"), { BLOCKSIZE * col, size.y - row * BLOCKSIZE });
+			flagMap.insert({ std::make_pair(BLOCKSIZE * col, size.y - row * BLOCKSIZE),flag });
+			collimap.insert({ std::make_pair(BLOCKSIZE * col, size.y - row * BLOCKSIZE), "flag" });
 		}
 	}
 	this->nbBlocks.x = maxCol + 1;
-	this->size = { nbBlocks.x * blockSize, nbBlocks.y * blockSize };
+	this->size = { nbBlocks.x * BLOCKSIZE, nbBlocks.y * BLOCKSIZE };
 }
 
 int Map::checkCollisions(int input) {
 
-	// Right
-	if (input == Direction::RIGHT) {
-		/* check if the player is colliding at his position */
-		std::tuple <std::vector<float>, std::vector<float>, std::vector<std::string>> res = this->quadtree->queryRange(player->getX() + (player->getGlobalBounds().width / 2), player->getY() + (player->getGlobalBounds().height / 2), player->getGlobalBounds().width / 2, player->getGlobalBounds().height / 2);
-		std::vector<float> temp = std::get<0>(res);
-
-		/* if the player is colliding */
-		if (temp.size() > 0) {
-			float xTemp = temp[0];
-			temp = std::get<1>(res);
-			float yTemp = temp[0];
-			std::vector<std::string> temp = std::get<2>(res);
-			std::string type = temp[0];
-
-			/* if the player is colliding with an enemy */
-			if (player->getGlobalBounds().intersects(sf::FloatRect(xTemp, yTemp, blockSize, blockSize)) && type =="enemy") {
-				player->damage();
-				player->setPosition(sf::Vector2f{ xTemp - player->getGlobalBounds().width - DISTANCE, player->getY()});
-				if (player->getLife() == 0)
-					return GameStatus::GAMEOVER;
-			}
-
-			/* if the player is colliding with a coin */
-			if (player->getGlobalBounds().intersects(sf::FloatRect(xTemp, yTemp, blockSize , blockSize)) && type == "coin") {
-				//remove coin from quadtree
-				this->quadtree->removeItem(player->getX() + (player->getGlobalBounds().width / 2), player->getY() + (player->getGlobalBounds().height / 2), player->getGlobalBounds().width / 2, player->getGlobalBounds().height / 2);
-
-				//remove coin from vector
-				for (auto it = coinMap.begin(); it != coinMap.end(); ++it) {
-					if (it->first.first >= xTemp - blockSize && it->first.first <= xTemp + blockSize  && it->first.second >= yTemp - blockSize && it->first.second <= yTemp + blockSize ) {
-						coinMap.erase(std::make_pair(it->first.first, it->first.second));
-						break;
-					}
-				}
-				
-				this->player->setScore(this->player->getScore() + 1);
-			}
-
-			/* if the player is colliding with a ground */
-			if (player->getGlobalBounds().intersects(sf::FloatRect(xTemp, yTemp, blockSize , blockSize )) && type == "ground") {
-
-				player->setPosition(sf::Vector2f{ xTemp - player->getGlobalBounds().width + 16 , player->getY() - 1 });
-				player->setPosY(player->getY() -1);
-				player->setStartJumping();
-			}
-
-			/* if the player is colliding with a flag */
-			if (player->getGlobalBounds().intersects(sf::FloatRect(xTemp, yTemp, blockSize, blockSize)) && type == "flag") {
+	for (auto it = collimap.begin(); it != collimap.end(); ++it) {
+		float x = it->first.first;
+		float y = it->first.second;
+		if (player->getGlobalBounds().intersects(sf::FloatRect(x, y, BLOCKSIZE, BLOCKSIZE)))
+		{
+			if (it->second == "flag")
 				return GameStatus::VICTORY;
+			else if (it->second == "coin")
+			{
+				coinMap.erase(std::make_pair(x, y));
+				collimap.erase(std::make_pair(x, y));
+				player->setScore(player->getScore() + 1);
+				it = collimap.begin();
 			}
-		}
-		/* check if the player is colliding at his position with the ground  (add +1 to height, necessary to do this otherwise bug when the player goes left and right */
-		else {
-			std::tuple <std::vector<float>, std::vector<float>, std::vector<std::string>> res = this->quadtree->queryRange(player->getX() + (player->getGlobalBounds().width / 2), player->getY() + (player->getGlobalBounds().height / 2) + 1, player->getGlobalBounds().width / 2, player->getGlobalBounds().height / 2);
-			std::vector<float> temp = std::get<0>(res);
-			if (temp.size() == 0) {
-				player->setBaseY();
-				player->setStartJumping();
-			}
-		}
-	}
-
-	// Left
-	if (input == Direction::LEFT) {
-		/* check if the player is colliding at his position */
-		std::tuple <std::vector<float>, std::vector<float>, std::vector<std::string>> res = this->quadtree->queryRange(player->getX() - (player->getGlobalBounds().width / 2), player->getY() + (player->getGlobalBounds().height / 2), player->getGlobalBounds().width / 2, player->getGlobalBounds().height / 2);
-		std::vector<float> temp = std::get<0>(res);
-
-		/* if the player is colliding */
-		if (temp.size() > 0) {
-			float xTemp = temp[0];
-			temp = std::get<1>(res);
-			float yTemp = temp[0];
-			std::vector<std::string> temp = std::get<2>(res);
-			std::string type = temp[0];
-
-			/* if the player is colliding with an enemy */
-			if (player->getGlobalBounds().intersects(sf::FloatRect(xTemp, yTemp, blockSize , blockSize )) && type == "enemy") {
-				player->damage();
-				player->setPosition(sf::Vector2f{ xTemp + player->getGlobalBounds().width + DISTANCE, player->getY() });
-				if (player->getLife() == 0)
-					return GameStatus::GAMEOVER;
-			}
-
-			/* if the player is colliding with a coin */
-			if (player->getGlobalBounds().intersects(sf::FloatRect(xTemp, yTemp, blockSize , blockSize )) && type == "coin") {
-				//remove coin from quadtree
-				this->quadtree->removeItem(player->getX() - (player->getGlobalBounds().width / 2), player->getY() + (player->getGlobalBounds().height / 2), player->getGlobalBounds().width / 2, player->getGlobalBounds().height / 2);
-
-				//remove coin from vector
-				for(auto it = coinMap.begin(); it != coinMap.end(); ++it) {
-					if (it->first.first >= xTemp - blockSize && it->first.first <= xTemp + blockSize  && it->first.second >= yTemp - blockSize  && it->first.second <= yTemp + blockSize ) {
-						coinMap.erase(std::make_pair(it->first.first, it->first.second));
-						break;
-					}
+			else if(it->second == "ground")
+			{
+				switch (input)
+				{
+				case Direction::UP:
+					player->setPosition({ player->getX(), y + DISTANCE });
+					break;
+				case Direction::DOWN:
+					player->stopJumping();
+					player->setPosition({ player->getX(), y - DISTANCE });
+					break;
+				case Direction::LEFT:
+					player->setPosition({ x + DISTANCE , player->getY() });
+					break;
+				case Direction::RIGHT:
+					player->setPosition({ x - DISTANCE, player->getY() });
+					break;
 				}
-
-				this->player->setScore(this->player->getScore() + 1);
 			}
-
-			/* if the player is colliding with a ground */
-			if (player->getGlobalBounds().intersects(sf::FloatRect(xTemp, yTemp, blockSize , blockSize )) && type == "ground") {
-				player->setPosition(sf::Vector2f{ xTemp + blockSize - 16 , player->getY() - 1});
-				player->setPosY(player->getY() - 1);
-				player->setStartJumping();
-			}
-
-			/* if the player is colliding with a flag */
-			if (player->getGlobalBounds().intersects(sf::FloatRect(xTemp, yTemp, blockSize, blockSize)) && type == "flag") {
-				return GameStatus::VICTORY;
-			}
-		}
-		/* check if the player is colliding at his position with the ground  (add +1 to height, necessary to do this otherwise bug when the player goes left and right */
-		else {
-			std::tuple <std::vector<float>, std::vector<float>, std::vector<std::string>> res = this->quadtree->queryRange(player->getX() - (player->getGlobalBounds().width / 2), player->getY() + (player->getGlobalBounds().height / 2) + 1, player->getGlobalBounds().width / 2, player->getGlobalBounds().height / 2);
-			std::vector<float> temp = std::get<0>(res);
-			if (temp.size() == 0) {
-				player->setBaseY();
-				player->setStartJumping();
-			}
-		}
-	}
-
-	// Down
-	if (input == Direction::DOWN) {
-		/* check if the player is colliding at his position */
-		std::tuple <std::vector<float>, std::vector<float>, std::vector<std::string>> res = this->quadtree->queryRange(player->getX(), player->getY() + (player->getGlobalBounds().height) / 2, player->getGlobalBounds().width / 2, player->getGlobalBounds().height / 2);
-		std::vector<float> temp = std::get<0>(res);
-
-		/* if the player is colliding */
-		if (temp.size() > 0) {
-			player->stopJumping();
-			float xTemp = temp[0];
-			temp = std::get<1>(res);
-			float yTemp = temp[0];
-			std::vector<std::string> temp = std::get<2>(res);
-			std::string type = temp[0];
-
-			/* if the player is colliding with an enemy */
-			if (player->getGlobalBounds().intersects(sf::FloatRect(xTemp, yTemp, blockSize, blockSize )) && type == "enemy") {
-				//remove enemy from quadtree
-				this->quadtree->removeItem(player->getX(), player->getY() + (player->getGlobalBounds().height / 2), player->getGlobalBounds().width / 2, player->getGlobalBounds().height / 2);
-				
-				//remove enemy from vector
-				for (auto it = enemyMap.begin(); it != enemyMap.end(); ++it) {
-					if (it->first.first >= xTemp - blockSize && it->first.first <= xTemp + blockSize && it->first.second >= yTemp - blockSize && it->first.second <= yTemp + blockSize) {
-						enemyMap.erase(std::make_pair(it->first.first, it->first.second));
-						break;
-					}
+			else
+			{
+				switch (input)
+				{
+				case Direction::UP:
+					player->stopJumping();
+					player->setPosition({ player->getX(), y + DISTANCE });
+					player->damage();
+					if (player->getLife() == 0)
+						return GameStatus::GAMEOVER;
+					break;
+				case Direction::DOWN:
+					enemyMap.erase(std::make_pair(x, y));
+					collimap.erase(std::make_pair(x, y));
+					player->setScore(player->getScore() + 5);
+					it = collimap.begin();
+					break;
+				case Direction::LEFT:
+					player->setPosition({ x + 55.f , player->getY() });
+					player->damage();
+					if (player->getLife() == 0)
+						return GameStatus::GAMEOVER;
+					break;
+				case Direction::RIGHT:
+					player->setPosition({ x - 55.f, player->getY() });
+					player->damage();
+					if (player->getLife() == 0)
+						return GameStatus::GAMEOVER;
+					break;
 				}
-				player->setScore(player->getScore() + 5);
-			}
-
-			/* if the player is colliding with a coin */
-			if (player->getGlobalBounds().intersects(sf::FloatRect(xTemp, yTemp, blockSize , blockSize )) && type == "coin") {
-				//remove coin from quadtree
-				this->quadtree->removeItem(player->getX(), player->getY() + (player->getGlobalBounds().height / 2), player->getGlobalBounds().width / 2, player->getGlobalBounds().height / 2);
-
-				//remove coin from vector
-				for (auto it = coinMap.begin(); it != coinMap.end(); ++it) {
-					if (it->first.first >= xTemp - blockSize && it->first.first <= xTemp + blockSize  && it->first.second >= yTemp - blockSize && it->first.second <= yTemp + blockSize ) {
-						coinMap.erase(std::make_pair(it->first.first, it->first.second));
-						break;
-					}
-				}
-
-				this->player->setScore(this->player->getScore() + 1);
-			}
-
-			/* if the player is colliding with a ground */
-			if (player->getGlobalBounds().intersects(sf::FloatRect(xTemp, yTemp, blockSize , blockSize )) && type == "ground") {
-				player->setPosition(sf::Vector2f{ player->getX() , yTemp - 22  });
-				player->setPosY(yTemp - 22 );
-				player->setStartJumping();
-			}
-
-			/* if the player is colliding with a flag */
-			if (player->getGlobalBounds().intersects(sf::FloatRect(xTemp, yTemp, blockSize, blockSize)) && type == "flag") {
-				return GameStatus::VICTORY;
-			}
-		}
-	}
-
-	// Up
-	if (input == Direction::UP) {
-		/* check if the player is colliding at his position */
-		std::tuple <std::vector<float>, std::vector<float>, std::vector<std::string>> res = this->quadtree->queryRange(player->getX(), player->getY() - (player->getGlobalBounds().height / 2), player->getGlobalBounds().width / 2, player->getGlobalBounds().height / 2);
-		std::vector<float> temp = std::get<0>(res);
-
-		/* if the player is colliding */
-		if (temp.size() > 0) {
-			float xTemp = temp[0];
-			temp = std::get<1>(res);
-			float yTemp = temp[0];
-			std::vector<std::string> temp = std::get<2>(res);
-			std::string type = temp[0];
-
-			/* if the player is colliding with an enemy */
-			if (player->getGlobalBounds().intersects(sf::FloatRect(xTemp, yTemp, blockSize , blockSize )) && type == "enemy") {
-				player->damage();
-				player->stopJumping();
-				if (player->getLife() == 0)
-					return GameStatus::GAMEOVER;
-			}
-
-			/* if the player is colliding with a coin */
-			if (player->getGlobalBounds().intersects(sf::FloatRect(xTemp, yTemp, blockSize , blockSize)) && type == "coin") {
-				//remove coin from quadtree
-				this->quadtree->removeItem(player->getX(), player->getY() - (player->getGlobalBounds().height / 2), player->getGlobalBounds().width / 2, player->getGlobalBounds().height / 2);
-
-				//remove coin from vector
-				for (auto it = coinMap.begin(); it != coinMap.end(); ++it) {
-					if (it->first.first >= xTemp - blockSize  && it->first.first <= xTemp + blockSize && it->first.second >= yTemp - blockSize  && it->first.second <= yTemp + blockSize ) {
-						coinMap.erase(std::make_pair(it->first.first, it->first.second));
-						break;
-					}
-				}
-
-				this->player->setScore(this->player->getScore() + 1);
-			}
-			
-			/* if the player is colliding with a ground */
-			if (player->getGlobalBounds().intersects(sf::FloatRect(xTemp, yTemp, blockSize , blockSize )) && type == "ground")
-				player->stopJumping();
-
-			/* if the player is colliding with a flag */
-			if (player->getGlobalBounds().intersects(sf::FloatRect(xTemp, yTemp, blockSize, blockSize)) && type == "flag") {
-				return GameStatus::VICTORY;
 			}
 		}
 	}

@@ -3,9 +3,9 @@
 /* --------------- ENEMY --------------- */
 
 Enemy::Enemy(sf::Vector2f size, sf::Texture* texture, sf::Vector2f position) {
+	enemy.setTexture(texture);
+	enemy.setPosition(position);
     enemy.setSize(size);
-    enemy.setTexture(texture);
-    enemy.setPosition(position);
     moveSpeed = 0;
 }
 
@@ -25,7 +25,7 @@ void Enemy::draw(sf::RenderWindow& window) {
     window.draw(enemy);
 }
 
-/* --------------- WOLF --------------- */
+/* --------------- ASTRONAUT --------------- */
 
-Wolf::Wolf(sf::Vector2f size, sf::Texture* texture, sf::Vector2f position) : Enemy(size, texture, position) {}
+Astronaut::Astronaut(sf::Vector2f size, sf::Texture* texture, sf::Vector2f position) : Enemy(size, texture, position) {}
 

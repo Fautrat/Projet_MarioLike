@@ -33,7 +33,6 @@ bool Quadtree::insert(float x, float y, std::string type) {
     // If there is space in this quad tree and if doesn't have subdivisions, add the item here
     if ((int)pointsX.size() < QT_NODE_CAPACITY && northWest == NULL)
     {
-
         pointsX.push_back(x);
         pointsY.push_back(y);
         this->type.push_back(type);
@@ -41,10 +40,8 @@ bool Quadtree::insert(float x, float y, std::string type) {
     }
 
     // Otherwise, subdivide and then add the item to whichever node will accept it
-    if (northWest == NULL) {
-
+    if (northWest == NULL)
         subdivide();
-    }
 
     //We have to add the items contained into this quad array to the new quads if we only want 
     //the last node to hold the item 
@@ -80,7 +77,7 @@ void Quadtree::subdivide() {
 }
 
 /* Get items that collide inside certain coordinates */
-std::tuple <std::vector<float>, std::vector<float>, std::vector<std::string>> Quadtree::queryRange(float x, float y, float halfDimensionX, float halfDimensionY) {
+std::tuple< std::vector<float>, std::vector<float>, std::vector<std::string>> Quadtree::queryRange(float x, float y, float halfDimensionX, float halfDimensionY) {
 
     std::vector<float> pointsInRangeX;
     std::vector<float> pointsInRangeY;
@@ -92,28 +89,32 @@ std::tuple <std::vector<float>, std::vector<float>, std::vector<std::string>> Qu
 
   
     // Automatically abort if the range does not intersect this quad
-    if (!(x >= this->x - this->halfDimensionX && x <= this->x + this->halfDimensionX && y >= this->y - this->halfDimensionY && y <= this->y + this->halfDimensionY)) {
-
+    if (!(x >= this->x - this->halfDimensionX && x <= this->x + this->halfDimensionX && y >= this->y - this->halfDimensionY && y <= this->y + this->halfDimensionY)) 
+	{
         return res; // empty 
     }
 
     // Check items at this quad level
     for (int p = 0; p < (int)pointsX.size(); p++)
     {
-
-        if ((pointsX[p] >= x - halfDimensionX && pointsX[p] <= x + halfDimensionX && pointsY[p] >= y - halfDimensionY && pointsY[p] < y + halfDimensionY)) {
+		//printf("%f et %f  : %d\n", pointsX[p], pointsY[p], p);
+        /*if ((pointsX[p] >= x - halfDimensionX && pointsX[p] <= x + halfDimensionX && pointsY[p] >= y - halfDimensionY && pointsY[p] < y + halfDimensionY)) {
             pointsInRangeX.push_back(x);
             pointsInRangeY.push_back(y);
             type.push_back(this->type[p]);
-
-        }
+        }*/
+		if ( (x + halfDimensionX >= pointsX[p] || (x  <= pointsX[p] + 40.f && x >= pointsX[p])) && ( y >= pointsY[p] - 40.f || (y - halfDimensionY <= pointsY[p] && y - halfDimensionY >= pointsY[p] - 40.f)))
+		{
+			pointsInRangeX.push_back(pointsX[p]);
+			pointsInRangeY.push_back(pointsY[p]);
+			type.push_back(this->type[p]);
+		}
     }
 
     // Terminate here, if there are no children
     if (northWest == NULL) {
 
         res = std::make_tuple(pointsInRangeX, pointsInRangeY,type);
-
         return res;
     }
 
@@ -160,7 +161,6 @@ std::tuple <std::vector<float>, std::vector<float>, std::vector<std::string>> Qu
 
 
     res = std::make_tuple(pointsInRangeX, pointsInRangeY, type);
-
     return res;
 }
 

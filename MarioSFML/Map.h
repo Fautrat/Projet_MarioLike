@@ -16,9 +16,10 @@ public:
 	std::map<std::pair<float, float>, Coin*> coinMap;
 	std::map<std::pair<float, float>, Flag*> flagMap;
 
+	std::map<std::pair<float, float>, std::string> collimap;
+
 	Quadtree* quadtree;
 
-	float blockSize;
 	sf::Vector2f size;
 	sf::Vector2i nbBlocks;
 

@@ -5,14 +5,9 @@ Player::Player(sf::Vector2f size, sf::Texture* texture, sf::Vector2f position) {
     player.setTexture(texture);
 	player.setPosition(position);
 	this->size = size.y;
-	this->moveSpeed = 0.f;
+	this->moveSpeedX = 0.f;
 	this->moveSpeedY = 0.f;
 	this->isJumping = false;
-	this->maxJump = 200.f;
-	this->posY = getY();
-	this->basePosY = getY();
-	this->startJumping = false;
-	this->gravity = 6.f;
 	this->score = 0;
 	this->life = 3;
 
@@ -22,29 +17,6 @@ void Player::draw(sf::RenderWindow& window) {
     window.draw(player);
 }
 
-void Player::jump(sf::Vector2f distance) {
-
-	//up
-	if (isJumping && getY() > posY - maxJump) {
-		player.move(distance * gravity);
-	}
-	//need to go down because maxJump reached
-	else 
-		isJumping = false;
-	//down
-	if (!isJumping && getY() < posY) {
-		player.move(distance * -gravity);
-		//put the player on the ground (without it the player is a bit in the ground)
-		/*if (getY() > posY) {
-			setPosition({ (float)getX(),posY });
-		}*/
-	}
-	//allow jump
-	if (!isJumping && getY() == posY) {
-		startJumping = false;
-		posY = basePosY;
-	}
-}
 
 void Player::setPosition(sf::Vector2f position) {
     player.setPosition(position);
@@ -60,10 +32,6 @@ float Player::getX() {
 
 float Player::getY() {
 	return player.getPosition().y;
-}
-
-float Player::getSpeed() {
-	return moveSpeed;
 }
 
 int Player::getScore() {
@@ -84,58 +52,44 @@ void Player::damage() {
 
 int Player::inputProcessing(float deltaTime, float mapSizeX) {
 
-	int retour;
+	int retour = Direction::UP;
 
+	//SPACE
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && !isJumping)
 	{
 		isJumping = true;
 		moveSpeedY = -300.f;
 	}
 
-
 	//RIGHT
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right) || sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
-		if (getX() + (moveSpeed * deltaTime) < mapSizeX)
-			moveSpeed = 200.f;
-			/*player.move({ moveSpeed * deltaTime, 0 });*/
+		if (getX() + (moveSpeedX * deltaTime) < mapSizeX)
+			moveSpeedX = 200.f;
 		retour = Direction::RIGHT;
 	}
 	//LEFT
 	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left) || sf::Keyboard::isKeyPressed(sf::Keyboard::Q)) {
-		if (getX() + (-moveSpeed * deltaTime) > 0)
-			if (getX() > moveSpeed * deltaTime)
-				moveSpeed = -200.f;
-				/*player.move({ -moveSpeed * deltaTime, 0 });*/
+		if (getX() + (-moveSpeedX * deltaTime) > 0)
+			if (getX() > moveSpeedX * deltaTime)
+				moveSpeedX = -200.f;
 		retour =  Direction::LEFT;
 	}
-	else
-		retour= Direction::DOWN;
+	else if(moveSpeedY >= 0.f)
+		retour = Direction::DOWN;
 
-	player.move(moveSpeed * deltaTime, moveSpeedY * deltaTime);
+	player.move(moveSpeedX * deltaTime, moveSpeedY * deltaTime);
 
-	if (isJumping)
-		moveSpeedY += gravity;
-	else
-		moveSpeedY = gravity;
+	if(isJumping)
+		moveSpeedY = moveSpeedY + GRAVITY;
 
-	moveSpeed = 0.f;
+
+	moveSpeedX = 0.f;
 
 	return retour;
 }
 
-void Player::stopJumping() {
+void Player::stopJumping() 
+{
 	isJumping = false;
-	moveSpeedY = 0.f;
-}
-
-void Player::setPosY(float posY) {
-	this->posY = posY;
-}
-
-void Player::setStartJumping() {
-	this->startJumping = false;
-}
-
-void Player::setBaseY() {
-	this->posY = basePosY;;
+	this->moveSpeedY = 0.f;
 }

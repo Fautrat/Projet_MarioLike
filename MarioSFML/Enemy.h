@@ -28,13 +28,13 @@ protected:
 	float moveSpeed;
 };
 
-/* --------------- WOLF --------------- */
+/* --------------- ASTRONAUT --------------- */
 
-class Wolf : public Enemy
+class Astronaut : public Enemy
 {
 public:
-	Wolf(sf::Vector2f size, sf::Texture* texture, sf::Vector2f position);
-	~Wolf() = default;
+	Astronaut(sf::Vector2f size, sf::Texture* texture, sf::Vector2f position);
+	~Astronaut() = default;
 };
 
 #endif // !ENEMY_H
