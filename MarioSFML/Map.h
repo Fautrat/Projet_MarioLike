@@ -15,7 +15,7 @@ public:
 	std::map<std::pair<float, float>, Coin*> coinMap;
 	std::map<std::pair<float, float>, Flag*> flagMap;
 
-	std::map<std::pair<float, float>, std::string> collimap;
+	std::map<std::pair<float, float>, std::string> colliMap;
 
 	sf::Vector2f size;
 	sf::Vector2i nbBlocks;

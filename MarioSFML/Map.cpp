@@ -97,37 +97,37 @@ void Map::readMap(AssetsManager& assets, std::string& filename) {
 		if (ch == 'G') {
 			Ground* ground = new Ground({ BLOCKSIZE, BLOCKSIZE }, &assets.getTRef("ground"), { BLOCKSIZE * col, size.y - row * BLOCKSIZE });
 			groundMap.insert({ std::make_pair(BLOCKSIZE * col, size.y - row * BLOCKSIZE),ground });
-			collimap.insert({ std::make_pair(BLOCKSIZE * col, size.y - row * BLOCKSIZE), "ground" });
+			colliMap.insert({ std::make_pair(BLOCKSIZE * col, size.y - row * BLOCKSIZE), "ground" });
 		}
 
 		if (ch == '1') {
 			Astronaut* enemy = new Astronaut({ BLOCKSIZE, BLOCKSIZE }, &assets.getTRef("astronaut"), { BLOCKSIZE * col, size.y - row * BLOCKSIZE });
 			enemyMap.insert({ std::make_pair(BLOCKSIZE * col, size.y - row * BLOCKSIZE),enemy });
-			collimap.insert({ std::make_pair(BLOCKSIZE * col, size.y - row * BLOCKSIZE), "enemy" });
+			colliMap.insert({ std::make_pair(BLOCKSIZE * col, size.y - row * BLOCKSIZE), "enemy" });
 		}
 
 		if (ch == 'o') {
 			Coin* coin = new Coin({ BLOCKSIZE, BLOCKSIZE }, &assets.getTRef("coin"), { BLOCKSIZE * col, size.y - row * BLOCKSIZE });
 			coinMap.insert({ std::make_pair(BLOCKSIZE * col, size.y - row * BLOCKSIZE),coin });
-			collimap.insert({ std::make_pair(BLOCKSIZE * col, size.y - row * BLOCKSIZE), "coin" });
+			colliMap.insert({ std::make_pair(BLOCKSIZE * col, size.y - row * BLOCKSIZE), "coin" });
 		}
 
 		if (ch == '*') {
 			Flag* flag = new Flag({ BLOCKSIZE, BLOCKSIZE }, &assets.getTRef("flagMiddle"), { BLOCKSIZE * col, size.y - row * BLOCKSIZE });
 			flagMap.insert({ std::make_pair(BLOCKSIZE * col, size.y - row * BLOCKSIZE),flag });
-			collimap.insert({ std::make_pair(BLOCKSIZE * col, size.y - row * BLOCKSIZE), "flag" });
+			colliMap.insert({ std::make_pair(BLOCKSIZE * col, size.y - row * BLOCKSIZE), "flag" });
 		}
 
 		if (ch == '=') {
 			Flag* flag = new Flag({ BLOCKSIZE, BLOCKSIZE }, &assets.getTRef("flagBottom"), { BLOCKSIZE * col, size.y - row * BLOCKSIZE });
 			flagMap.insert({ std::make_pair(BLOCKSIZE * col, size.y - row * BLOCKSIZE),flag });
-			collimap.insert({ std::make_pair(BLOCKSIZE * col, size.y - row * BLOCKSIZE), "flag" });
+			colliMap.insert({ std::make_pair(BLOCKSIZE * col, size.y - row * BLOCKSIZE), "flag" });
 		}
 
 		if (ch == '-') {
 			Flag* flag = new Flag({ BLOCKSIZE, BLOCKSIZE }, &assets.getTRef("flagTop"), { BLOCKSIZE * col, size.y - row * BLOCKSIZE });
 			flagMap.insert({ std::make_pair(BLOCKSIZE * col, size.y - row * BLOCKSIZE),flag });
-			collimap.insert({ std::make_pair(BLOCKSIZE * col, size.y - row * BLOCKSIZE), "flag" });
+			colliMap.insert({ std::make_pair(BLOCKSIZE * col, size.y - row * BLOCKSIZE), "flag" });
 		}
 	}
 	this->nbBlocks.x = maxCol + 1;
@@ -136,7 +136,7 @@ void Map::readMap(AssetsManager& assets, std::string& filename) {
 
 int Map::checkCollisions(int input) {
 
-	for (auto it = collimap.begin(); it != collimap.end(); ++it) {
+	for (auto it = colliMap.begin(); it != colliMap.end(); ++it) {
 		float x = it->first.first;
 		float y = it->first.second;
 		if (player->getGlobalBounds().intersects(sf::FloatRect(x, y, BLOCKSIZE, BLOCKSIZE)))
@@ -146,9 +146,9 @@ int Map::checkCollisions(int input) {
 			else if (it->second == "coin")
 			{
 				coinMap.erase(std::make_pair(x, y));
-				collimap.erase(std::make_pair(x, y));
+				colliMap.erase(std::make_pair(x, y));
 				player->setScore(player->getScore() + 1);
-				it = collimap.begin();
+				it = colliMap.begin();
 			}
 			else if(it->second == "ground")
 			{
@@ -182,9 +182,9 @@ int Map::checkCollisions(int input) {
 					break;
 				case Direction::DOWN:
 					enemyMap.erase(std::make_pair(x, y));
-					collimap.erase(std::make_pair(x, y));
+					colliMap.erase(std::make_pair(x, y));
 					player->setScore(player->getScore() + 5);
-					it = collimap.begin();
+					it = colliMap.begin();
 					break;
 				case Direction::LEFT:
 					player->setPosition({ x + 55.f , player->getY() }); /* distance 55.f plus grande sinon on collisionne encore avec l'enemy */
